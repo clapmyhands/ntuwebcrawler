@@ -3,6 +3,17 @@ Created on Sep 17, 2014
 
 @author: Phuah Chee Chong
 '''
+
+
+'''
+--------------<               EDIT NOTE            >------------------
+Edited: 21 Aug 2015
+@author: StefanSetyadiTjeng / clapmyhands
+
+added a getCategory function for choosing topic (e.g. business, economy, politics, sports)
+empty if not specifed
+'''
+
 # -*- coding: utf-8 -*-
 # import urllib2, html5lib
 import urllib3
@@ -102,11 +113,13 @@ class buildSeed():
 
         return allReturnedURL
 
-    def getAuthor(self, articleAuthorList):
+    def getAuthor(self, articleAuthor):
 
         author = ""
-        for author in articleAuthorList:
-            author = author.text_content()
+        try:
+            author = articleAuthor[0].text_content()
+        except:
+            author = ""
 
         return author
 
@@ -118,15 +131,18 @@ class buildSeed():
 
         return articleKeywords
 
-    def getArticleDate(self, articleDateList, dateFormat):
+    def getArticleDate(self, articleDate, dateFormat):
         articleDate = ""
+
         try:
-            articleDate = articleDateList[0].text_content()
-            articleDate = (articleDate.split(',')[1]).split('|')[0]
+            # only for beritasatu
+            #articleDate = (articleDate.split(',')[1]).split('|')[0]
+
             articleDate = convertMonthToEnglish(articleDate)
             articleDate = time.strptime(articleDate, dateFormat)
         except:
             articleDate = ""
+
         return articleDate
 
     def getArticleContent(self, text):
@@ -140,18 +156,18 @@ class buildSeed():
 
         return combinedSentences
 
-    def extractContent(self, articleAuthorList, articleKeywordsList, articleDateList, dateFormat, text):
+    def extractContent(self, articleAuthor, articleKeywordsList, articleDateList, dateFormat, text, category):
         ''' input : str(one url)
         output : str (utf8 text of the article)
         '''
         allContentInfo = list()
 
-        author = self.getAuthor(articleAuthorList)
+        author = self.getAuthor(articleAuthor)
         articleKeywords = self.getKeyword(articleKeywordsList)
-        articleDate = self.getArticleDate(articleDateList, dateFormat)
+        articleDate = self.getArticleDate(articleDate, dateFormat)
         combinedSentences = self.getArticleContent(text)
 
         allContentInfo.append(
-            [combinedSentences, author, articleDate, articleKeywords])
+            [combinedSentences, author, articleDate, articleKeywords, category])
 
         return allContentInfo

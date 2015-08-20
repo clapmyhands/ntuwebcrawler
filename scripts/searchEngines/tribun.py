@@ -1,53 +1,81 @@
 '''
-Created on Dec 22, 2014
+Created on Aug 21, 2015
 
-@author: Panzz
+@author: StefanSetyadiTjeng / clapmyhands
+added getCategory from normal seed.py for handling topic
 '''
 from seed import buildSeed
+from lxml import html
 
-class beritasatu(buildSeed):
+
+class tribun(buildSeed):
 
     def __init__(self):
         pass
 
     def crawlFrontierL2(self, currentQuery):
-        baseURL = "http://sp.beritasatu.com"
-        seedURL = "http://sp.beritasatu.com/pages/archive/index.php" # Where the seed links are located
-        xpath = "//div[@class='midRedBarArc']//table//tr//td//a"
+        baseURL = "http://www.tribunnews.com"
+        # Where the seed links are located
+        seedURL = "http://www.tribunnews.com/index-news/?date=2015-8-19"
+        xpath = "//li[@class='ptb15']//ul//li//div[@class='pt10 pb10']//a"
 
         allReturnedURL = list()
 
-        date = currentQuery.split('-') # date
-
-        allReturnedURL = buildSeed.crawlFrontierL1(self, currentQuery, baseURL, xpath, seedURL + "?year=" + date[2] + '&month=' + date[1] + '&day=' + date[0])
+        # currentQuery is suited to tribun archive query
+        allReturnedURL = buildSeed.crawlFrontierL1(
+            self, currentQuery, baseURL, xpath, seedURL + "?date=" + currentQuery)
 
         return allReturnedURL
+
+
+def buildQuery(qYear, qMonth, qDay):
+    # used to build specific query for each site archive
+    qDate = ""
+    try:
+        qDate = qYear + '-' + qMonth + '-' + qDay
+    except:
+        qDate = ""
+    return qDate
 
 
 def buildCrawlFrontier(currentQuery):
 
     allReturnedURL = list()
 
-    beritasatuCrawlFrontier = beritasatu()
+    tribunCrawlFrontier = tribun()
 
-    allReturnedURL = beritasatuCrawlFrontier.crawlFrontierL2(currentQuery)
+    allReturnedURL = tribunCrawlFrontier.crawlFrontierL2(currentQuery)
 
     return allReturnedURL
 
+
 def cleanResultFile(seedURL):
 
-    beritasatuCrawlFrontier = beritasatu()
+    tribunCrawlFrontier = tribun()
 
-    beritasatuCrawlFrontier.doc = beritasatuCrawlFrontier.retrieveSource(seedURL)
+    tribunCrawlFrontier.doc = tribunCrawlFrontier.retrieveSource(seedURL)
 
-    if beritasatuCrawlFrontier.doc == "":
+    if tribunCrawlFrontier.doc == "":
         return ""
 
-    text = beritasatuCrawlFrontier.doc.xpath('//div[@id="bodytext"]/p')
-    articleKeywordsList = beritasatuCrawlFrontier.doc.xpath('//meta[@name="keywords"]')
-    articleDateList = beritasatuCrawlFrontier.doc.xpath('//div[@id="contentwrapper"]/p/span[@class="caption"]')
+    text = tribunCrawlFrontier.doc.xpath(
+        '//div[@id="article_con"]//div[@class="side-article txt-article"]/p')
+    articleKeywordsList = tribunCrawlFrontier.doc.xpath(
+        '//meta[@name="keywords"]')
+    # date in DD-MMMM-YYYY HH:mm
+    articleDate = tribunCrawlFrontier.doc.xpath(
+        '//meta[@name="og:url"]')
+    dateFormat = " %d %B %Y %H:%M "
+
     articleAuthorList = ""
 
-    dateFormat = " %d %B %Y "
+    # tribun category is in the url
+    try:
+        category = tribunCrawlFrontier.doc.xpath(
+            '//meta[@name="og:url"]')
+        category = category.split('/')[3]
+    except:
+        category = ""
 
-    return beritasatuCrawlFrontier.extractContent(articleAuthorList, articleKeywordsList, articleDateList, dateFormat, text)
+    #parameter (xpath,xpath,xpath,string,string,string)
+    return tribunCrawlFrontier.extractContent(articleAuthor, articleKeywordsList, articleDate, dateFormat, text, category)

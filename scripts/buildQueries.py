@@ -102,7 +102,7 @@ if __name__ == '__main__':
 
             strCurY = str(startDates.year)
 
-            currentQuery = strCurD + '-' + strCurM + '-' + strCurY
+            currentQuery = module.buildQuery(strCurY,strCurM,strCurD)
 
             urlList = list()
 
