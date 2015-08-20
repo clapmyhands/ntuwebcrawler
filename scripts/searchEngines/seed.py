@@ -131,13 +131,13 @@ class buildSeed():
 
         return articleKeywords
 
-    def getArticleDate(self, articleDate, dateFormat):
+    def getArticleDate(self, articleDateList, dateFormat):
         articleDate = ""
 
         try:
             # only for beritasatu
             #articleDate = (articleDate.split(',')[1]).split('|')[0]
-
+            articleDate = articleDateList[0].text_content().split(',',1)[1]
             articleDate = convertMonthToEnglish(articleDate)
             articleDate = time.strptime(articleDate, dateFormat)
         except:
@@ -164,10 +164,10 @@ class buildSeed():
 
         author = self.getAuthor(articleAuthor)
         articleKeywords = self.getKeyword(articleKeywordsList)
-        articleDate = self.getArticleDate(articleDate, dateFormat)
+        articleDate = self.getArticleDate(articleDateList, dateFormat)
         combinedSentences = self.getArticleContent(text)
 
         allContentInfo.append(
-            [combinedSentences, author, articleDate, articleKeywords, category])
+            [combinedSentences, author, articleDateList, articleKeywords, category])
 
         return allContentInfo
