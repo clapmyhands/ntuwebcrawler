@@ -1,9 +1,6 @@
 <?xml version='1.0' encoding='utf-8'?>
 <querySeq>
-	
-	<query endD="9" endM="3" endY="2014" source="utusanArchive" startD="11" startM="3" startY="2013" />	
-	<query endD="" endM="" endY="" source="beritasatu" startD="11" startM="1" startY="2015" />
-	<query endD="" endM="" endY="" source="utusanDaily" startD="23" startM="2" startY="2015" />	
-	<query endD="" endM="" endY="" source="tsdDaily" startD="1" startM="1" startY="2010" />
-	
+
+	<query endD="21" endM="8" endY="2015" source="beritasatu" startD="22" startM="8" startY="2015" />
+
 </querySeq>

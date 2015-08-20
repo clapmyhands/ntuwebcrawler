@@ -70,10 +70,6 @@ if __name__ == '__main__':
         '''
 		if no end date is specified, the current date will be used
 		'''
-        if "Daily" in source:
-            iniStartY = iniCrawlY
-            iniStartM = iniCrawlM
-            iniStartD = iniCrawlD
 
         if endD == "":
             endD = iniCrawlD
@@ -177,8 +173,7 @@ if __name__ == '__main__':
 
                     # Now we need to assign the published date as normal
                     # datetime format
-                    articleDate = str(articleDate[2]).zfill(
-                        2) + str(articleDate[1]).zfill(2) + str(articleDate[0])
+                    articleDate = str(articleDate[1]).zfill(2) + str(articleDate[0])
 
                     fName = articleDate + '.xml'
 
