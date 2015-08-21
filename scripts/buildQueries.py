@@ -90,10 +90,6 @@ if __name__ == '__main__':
 
             modifiedFiles = list()
 
-            if "Monthly" in source:
-                startDates += datetime.timedelta(days=calendar.monthrange(
-                    int(startDates.year), int(startDates.month))[1] - 1)
-
             strCurD = str(startDates.day)
             strCurD = strCurD.zfill(2)  # Pads zero to the left
 
@@ -101,7 +97,6 @@ if __name__ == '__main__':
             strCurM = strCurM.zfill(2)
 
             strCurY = str(startDates.year)
-
 
             urlList = list()
 
@@ -114,7 +109,7 @@ if __name__ == '__main__':
             # Get the list of links from the archive search
             #urlList = module.produceAddressURL(currentQuery)
 
-            currentQuery = module.buildQuery(strCurY,strCurM,strCurD)
+            currentQuery = module.buildQuery(strCurY, strCurM, strCurD)
 
             urlList = module.buildCrawlFrontier(currentQuery)
 
@@ -148,19 +143,19 @@ if __name__ == '__main__':
 				4. Article Keywords
 				'''
 
-                allContentInfo = module.cleanResultFile(url)
+                allContentInfo = module.cleanResultFile(url)[0]
 
                 if allContentInfo == "":
                     continue
 
-                for contentInfo in allContentInfo:
-                    article = contentInfo[0]
-                    author = contentInfo[1]
-                    # 2 = day, 1 = month, 0 = year
-                    articleDate = contentInfo[2]
-                    articleKeywords = contentInfo[3]
+                article = allContentInfo[0]
+                author = allContentInfo[1]
+                # 2 = day, 1 = month, 0 = year
+                articleDate = allContentInfo[2]
+                articleKeywords = allContentInfo[3]
 
-                if articleDate == "":
+                fName = articleDate
+                if fName == "":
                     fName = "unknownDate.xml"
                     # Since no known published date, put it to the crawling
                     # date.
@@ -169,14 +164,15 @@ if __name__ == '__main__':
 
                 else:
                     dName = args.outputDir + "/" + source + "/" + \
-                        str(articleDate[0]).zfill(2) + "/" + \
+                        str(articleDate[0]) + "/" + \
                         str(articleDate[1]).zfill(2)
 
                     # Now we need to assign the published date as normal
                     # datetime format
-                    articleDate = str(articleDate[1]).zfill(2) + str(articleDate[0])
+                articleDate = str(articleDate[
+                                  0]) + "-" + str(articleDate[1]).zfill(2) + "-" + str(articleDate[2]).zfill(2)
 
-                    fName = articleDate + '.xml'
+                fName = str(fName[2]).zfill(2) + '.xml'
 
                 # Create XML File if it does not already exists.
                 createXMLFile(dName, fName, strCurD, strCurM,
@@ -198,7 +194,6 @@ if __name__ == '__main__':
 
                 try:
                     print(title)
-
                 except:
                     pass
 

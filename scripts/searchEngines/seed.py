@@ -25,7 +25,7 @@ import urllib.parse as urlparse
 import time
 from _ast import Str
 from cleaning.cleanText import convertMonthToEnglish
-from htmlHandler.htmlControl import createHTMLFile
+#from htmlHandler.htmlControl import createHTMLFile
 # _________________________________________________________________________________####
 
 
@@ -56,7 +56,7 @@ class buildSeed():
 
                 doc = html.document_fromstring(data)
 
-                createHTMLFile(data, seedURL, doc)
+                #createHTMLFile(data, seedURL, doc)
 
             except urllib3.exceptions.HTTPError:
                 print("An error occurred, retrying %d" % (count))
@@ -89,7 +89,7 @@ class buildSeed():
         allReturnedURL = list()
 
         doc = self.retrieveSource(seedURL)
-        print(doc.xpath(xpath))
+        #print(doc.xpath(xpath))
 
         for returnedUrl in doc.xpath(xpath):
             # return the search page in the form of [url, title, category,
@@ -100,7 +100,6 @@ class buildSeed():
             else:
                 url = self.baseURL + str(returnedUrl.attrib.get('href'))
 
-            print(url)
             category = urlparse.urlparse(url).path
             category = category.split('/', 4)
 
@@ -109,7 +108,7 @@ class buildSeed():
             else:
                 category = [category[2]]
 
-            allReturnedURL.append([url, str(returnedUrl.text_content()), category[0].replace('_', ' '),
+            allReturnedURL.append([url, str(returnedUrl.text_content()).strip(), category[0].replace('_', ' '),
                 str(date[2]) + str(date[1]) + str(date[0])])
 
         return allReturnedURL
@@ -135,14 +134,14 @@ class buildSeed():
     def getArticleDate(self, articleDateList, dateFormat):
         articleDate = ""
 
-        try:
+        for date in articleDateList:
             # only for beritasatu
             #articleDate = (articleDate.split(',')[1]).split('|')[0]
-            articleDate = articleDateList[0].text_content().split(',',1)[1]
+            articleDate = date.text_content()
             articleDate = convertMonthToEnglish(articleDate)
+            #only for tribunnews
+            articleDate = " ".join(articleDate.split(' ')[1:-1])
             articleDate = time.strptime(articleDate, dateFormat)
-        except:
-            articleDate = ""
 
         return articleDate
 
@@ -169,6 +168,6 @@ class buildSeed():
         combinedSentences = self.getArticleContent(text)
 
         allContentInfo.append(
-            [combinedSentences, author, articleDateList, articleKeywords])
+            [combinedSentences, author, articleDate, articleKeywords])
 
         return allContentInfo
