@@ -89,9 +89,9 @@ class buildSeed():
         allReturnedURL = list()
 
         doc = self.retrieveSource(seedURL)
+        print(doc.xpath(xpath))
 
         for returnedUrl in doc.xpath(xpath):
-
             # return the search page in the form of [url, title, category,
             # published date]
             if "http" in str(returnedUrl.attrib.get('href')):
@@ -100,6 +100,7 @@ class buildSeed():
             else:
                 url = self.baseURL + str(returnedUrl.attrib.get('href'))
 
+            print(url)
             category = urlparse.urlparse(url).path
             category = category.split('/', 4)
 
@@ -108,8 +109,8 @@ class buildSeed():
             else:
                 category = [category[2]]
 
-            allReturnedURL.append([url, str(returnedUrl.text_content()), category[
-                                  0].replace('_', ' '), str(date[0]) + str(date[1]) + str(date[2])])
+            allReturnedURL.append([url, str(returnedUrl.text_content()), category[0].replace('_', ' '),
+                str(date[2]) + str(date[1]) + str(date[0])])
 
         return allReturnedURL
 
@@ -156,7 +157,7 @@ class buildSeed():
 
         return combinedSentences
 
-    def extractContent(self, articleAuthor, articleKeywordsList, articleDateList, dateFormat, text, category):
+    def extractContent(self, articleAuthor, articleKeywordsList, articleDateList, dateFormat, text):
         ''' input : str(one url)
         output : str (utf8 text of the article)
         '''
@@ -168,6 +169,6 @@ class buildSeed():
         combinedSentences = self.getArticleContent(text)
 
         allContentInfo.append(
-            [combinedSentences, author, articleDateList, articleKeywords, category])
+            [combinedSentences, author, articleDateList, articleKeywords])
 
         return allContentInfo

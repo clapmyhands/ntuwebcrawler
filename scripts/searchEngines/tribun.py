@@ -16,8 +16,8 @@ class tribun(buildSeed):
     def crawlFrontierL2(self, currentQuery):
         baseURL = "http://www.tribunnews.com"
         # Where the seed links are located
-        seedURL = "http://www.tribunnews.com/index-news/?date=2015-8-19"
-        xpath = "//li[@class='ptb15']//ul//li//div[@class='pt10 pb10']//a"
+        seedURL = "http://www.tribunnews.com/index-news/"
+        xpath = "//li[@class='ptb15']//div//a"
 
         allReturnedURL = list()
 
@@ -43,8 +43,8 @@ def buildCrawlFrontier(currentQuery):
     allReturnedURL = list()
 
     tribunCrawlFrontier = tribun()
-
     allReturnedURL = tribunCrawlFrontier.crawlFrontierL2(currentQuery)
+
 
     return allReturnedURL
 
@@ -69,13 +69,5 @@ def cleanResultFile(seedURL):
 
     articleAuthorList = ""
 
-    # tribun category is in the url
-    try:
-        category = tribunCrawlFrontier.doc.xpath(
-            '//meta[@name="og:url"]')
-        category = category.split('/')[3]
-    except:
-        category = ""
-
     #parameter (xpath,xpath,xpath,string,string,string)
-    return tribunCrawlFrontier.extractContent(articleAuthor, articleKeywordsList, articleDate, dateFormat, text, category)
+    return tribunCrawlFrontier.extractContent(articleAuthor, articleKeywordsList, articleDate, dateFormat, text)

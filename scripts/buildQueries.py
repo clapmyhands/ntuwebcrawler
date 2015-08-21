@@ -102,7 +102,6 @@ if __name__ == '__main__':
 
             strCurY = str(startDates.year)
 
-            currentQuery = module.buildQuery(strCurY,strCurM,strCurD)
 
             urlList = list()
 
@@ -114,6 +113,8 @@ if __name__ == '__main__':
             #~ (urlList, urlQuery) = module.produceAddressURL(currentQuery)
             # Get the list of links from the archive search
             #urlList = module.produceAddressURL(currentQuery)
+
+            currentQuery = module.buildQuery(strCurY,strCurM,strCurD)
 
             urlList = module.buildCrawlFrontier(currentQuery)
 

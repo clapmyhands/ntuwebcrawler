@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='utf-8'?>
 <querySeq>
 
-	<!--  <query endD="21" endM="8" endY="2015" source="beritasatu" startD="22" startM="8" startY="2015" />   -->
-	<query endD="21" endM="8" endY="2015" source="tribun" startD="20" startM="8" startY="2015" />
+
+	<query endD="21" endM="8" endY="2015" source="tribun" startD="22" startM="8" startY="2015" />
 
 </querySeq>
