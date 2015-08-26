@@ -8,6 +8,7 @@ from seed import buildSeed
 from lxml import html
 from urllib3 import PoolManager
 
+
 class tribun(buildSeed):
 
     def __init__(self):
@@ -19,20 +20,24 @@ class tribun(buildSeed):
         seedURL = "http://www.tribunnews.com/index-news/"
         xpath = '//li[@class="ptb15"]/div[contains(@class,"f16") and contains(@class,"fbo")]/a'
 
-        #pagings system
-        tempHTML = PoolManager().urlopen('GET',seedURL)
+        # pagings system
+        tempHTML = PoolManager().urlopen('GET', seedURL)
         tempDoc = html.document_fromstring(tempHTML.data)
         tempHTML.close()
-        last_page = tempDoc.xpath('//div[@id="paginga"]/div[contains(@class,"paging")]/a[last()]/@href')[0]
-        last_page=int(last_page.split('=')[-1])
+
+        last_page = tempDoc.xpath('//div[@id="paginga"]/div[contains(@class,"paging")]/a[last()]/@href')
+        temp = ""
+        for iterator in last_page:
+            temp = iterator
+        last_page = int(temp.split('=')[-1])
 
         allReturnedURL = list()
 
-        #currentQuery is suited to tribun archive query
+        # currentQuery is suited to tribun archive query
         for iterator in range(last_page):
             try:
                 allReturnedURL.extend(buildSeed.crawlFrontierL1(
-                    self, currentQuery, baseURL, xpath, seedURL + "?date=" + currentQuery + "&page=" + str(iterator+1)))
+                    self, currentQuery, baseURL, xpath, seedURL + "?date=" + currentQuery + "&page=" + str(iterator + 1)))
             except:
                 allReturnedURL = buildSeed.crawlFrontierL1(
                     self, currentQuery, baseURL, xpath, seedURL + "?date=" + currentQuery + "&page=1")
@@ -59,6 +64,7 @@ def buildCrawlFrontier(currentQuery):
 
     return allReturnedURL
 
+
 def cleanResultFile(seedURL):
 
     tribunCrawlFrontier = tribun()
@@ -67,10 +73,13 @@ def cleanResultFile(seedURL):
     if tribunCrawlFrontier.doc == "":
         return ""
 
-    text = tribunCrawlFrontier.doc.xpath('//div[contains(@class,"txt-article") and contains(@class,"side-article")]/p')
-    articleKeywordsList = tribunCrawlFrontier.doc.xpath('//meta[@name="keywords"]')
+    text = tribunCrawlFrontier.doc.xpath(
+        '//div[contains(@class,"txt-article") and contains(@class,"side-article")]/p')
+    articleKeywordsList = tribunCrawlFrontier.doc.xpath(
+        '//meta[@name="keywords"]')
     # date in DD-MMMM-YYYY HH:mm
-    articleDate = tribunCrawlFrontier.doc.xpath('//div[@id="article"]/div[contains(@class,"bdr3")]/h3')
+    articleDate = tribunCrawlFrontier.doc.xpath(
+        '//div[@id="article"]/div[contains(@class,"bdr3")]/h3')
     dateFormat = "%d %B %Y %H:%M"
 
     articleAuthor = ""
