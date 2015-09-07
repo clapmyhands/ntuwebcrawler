@@ -22,15 +22,11 @@ The crawling is a 3 step process:
 
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser(
-        description='From a list of query contained in a file, poduce xml documents conaining text articles')
-    parser.add_argument('-i', '--input', dest='input',
-                        help='Query file', required=True)
-    parser.add_argument('-o', '--outputDir', dest='outputDir',
-                        help='OutputDirectory', required=True)
+    parser = argparse.ArgumentParser(description='From a list of query contained in a file, poduce xml documents conaining text articles')
+    parser.add_argument('-i', '--input', dest='input',help='Query file', required=True)
+    parser.add_argument('-o', '--outputDir', dest='outputDir',help='OutputDirectory', required=True)
     # parser.add_argument('-d', '--done'  , dest='listDone', help='Defines the list of query to process and already processed idStart="0" idEnd="0" idDone="0" included, if -1 project to maxima', required=True)
-    parser.add_argument('-v', '--verbose', dest='verbose',
-                        help='verbose mode', action='store_true')
+    parser.add_argument('-v', '--verbose', dest='verbose',help='verbose mode', action='store_true')
     args = parser.parse_args()
 
     ########## ___loading or creating listDone___ ########
@@ -80,8 +76,7 @@ if __name__ == '__main__':
         if endY == "":
             endY = iniCrawlY
 
-        startDates = datetime.date(
-            int(iniStartY), int(iniStartM), int(iniStartD))
+        startDates = datetime.date(int(iniStartY), int(iniStartM), int(iniStartD))
         endDates = datetime.date(int(endY), int(endM), int(endD))
         day = datetime.timedelta(days=1)
         normaliseUptoDate = startDates
@@ -94,8 +89,6 @@ if __name__ == '__main__':
             strCurM = str(startDates.month).zfill(2)
             strCurY = str(startDates.year)
 
-            urlList = list()
-
             # peut permettre de généraliser la gestion de modules en les
             # chargeant si nécessaire.
             module = __import__(source)
@@ -104,9 +97,9 @@ if __name__ == '__main__':
             #~ (urlList, urlQuery) = module.produceAddressURL(currentQuery)
             # Get the list of links from the archive search
             #urlList = module.produceAddressURL(currentQuery)
-
             currentQuery = module.buildQuery(strCurY, strCurM, strCurD)
 
+            urlList = list()
             urlList = module.buildCrawlFrontier(currentQuery)
 
             if not urlList:
@@ -153,8 +146,7 @@ if __name__ == '__main__':
                 fName = articleDate
                 if fName == "":
                     fName = "unknownDate.xml"
-                    # Since no known published date, put it to the crawling
-                    # date.
+                    # Since no known published date, put it to the crawling date.
                     articleDate = "unknownDate"
                     dName = args.outputDir + "/" + source + "/" + strCurY + "/" + strCurM
 
@@ -163,16 +155,13 @@ if __name__ == '__main__':
                         str(articleDate[0]) + "/" + \
                         str(articleDate[1]).zfill(2)
 
-                    # Now we need to assign the published date as normal
-                    # datetime format
-                articleDate = str(articleDate[
-                                  0]) + "-" + str(articleDate[1]).zfill(2) + "-" + str(articleDate[2]).zfill(2)
+                    # Now we need to assign the published date as normal datetime format
+                articleDate = str(articleDate[0]) + "-" + str(articleDate[1]).zfill(2) + "-" + str(articleDate[2]).zfill(2)
 
                 fName = str(fName[2]).zfill(2) + '.xml'
 
                 # Create XML File if it does not already exists.
-                createXMLFile(dName, fName, strCurD, strCurM,
-                              strCurY, source, currentQuery)
+                createXMLFile(dName, fName, strCurD, strCurM,strCurY, source, currentQuery)
 
                 xmldoc = openXMLFile(dName, fName)
 
@@ -204,8 +193,7 @@ if __name__ == '__main__':
                 if fName not in modifiedFiles:
                     modifiedFiles.append(dName + "/" + fName)
 
-            # Reopens the file to format it before writing it back to the same
-            # file again.
+            # Reopens the file to format it before writing it back to the same file again.
             print('Formatting files that has been modified...')
 
             formatXML(modifiedFiles)
