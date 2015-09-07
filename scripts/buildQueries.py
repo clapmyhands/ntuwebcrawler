@@ -1,8 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-import sys,os,argparse,datetime,calendar
-from retrying import retry
+import sys,os,argparse,datetime,calendar,pdb,time
 from xmlHandler.xmlControl import *
 from normalisation.normalise import normalise
 from dateutil.relativedelta import relativedelta
@@ -52,151 +51,161 @@ if __name__ == '__main__':
     iniCrawlM = now.month
     iniCrawlD = now.day
 
-    @retry(wait_fixed=2000)
-    for s in rootRequest:
-        source = s.get('source')
-        iniStartY = s.get('startY')
-        iniStartM = s.get('startM')
-        iniStartD = s.get('startD')
-        endY = s.get('endY')
-        endM = s.get('endM')
-        endD = s.get('endD')
+    #putting a dirty dirty retry decorator T_T
+    counter =0
+    while(counter <3):
+        try:
+            for s in rootRequest:
+                source = s.get('source')
+                iniStartY = s.get('startY')
+                iniStartM = s.get('startM')
+                iniStartD = s.get('startD')
+                endY = s.get('endY')
+                endM = s.get('endM')
+                endD = s.get('endD')
 
-        '''
-		if no end date is specified, the current date will be used
-		'''
+                '''
+        		if no end date is specified, the current date will be used
+        		'''
 
-        if endD == "":
-            endD = iniCrawlD
+                if endD == "":
+                    endD = iniCrawlD
 
-        if endM == "":
-            endM = iniCrawlM
+                if endM == "":
+                    endM = iniCrawlM
 
-        if endY == "":
-            endY = iniCrawlY
+                if endY == "":
+                    endY = iniCrawlY
 
-        startDates = datetime.date(int(iniStartY), int(iniStartM), int(iniStartD))
-        endDates = datetime.date(int(endY), int(endM), int(endD))
-        day = datetime.timedelta(days=1)
-        normaliseUptoDate = startDates
+                startDates = datetime.date(int(iniStartY), int(iniStartM), int(iniStartD))
+                endDates = datetime.date(int(endY), int(endM), int(endD))
+                day = datetime.timedelta(days=1)
+                normaliseUptoDate = startDates
 
-        while (startDates <= endDates):
+                while (startDates <= endDates):
 
-            modifiedFiles = list()
+                    modifiedFiles = list()
 
-            strCurD = str(startDates.day)zfill(2)  # Pads zero to the left
-            strCurM = str(startDates.month).zfill(2)
-            strCurY = str(startDates.year)
+                    strCurD = str(startDates.day)
+                    strCurD = strCurD.zfill(2)  # Pads zero to the left
+                    strCurM = str(startDates.month)
+                    strCurM = strCurM.zfill(2)
+                    strCurY = str(startDates.year)
 
-            # peut permettre de généraliser la gestion de modules en les
-            # chargeant si nécessaire.
-            module = __import__(source)
+                    urlList = list()
+                    # peut permettre de généraliser la gestion de modules en les
+                    # chargeant si nécessaire.
+                    module = __import__(source)
 
-            #~ (urlList, urlQuery) = LIBERATION.produceAddressURL(currentQuery)
-            #~ (urlList, urlQuery) = module.produceAddressURL(currentQuery)
-            # Get the list of links from the archive search
-            #urlList = module.produceAddressURL(currentQuery)
-            currentQuery = module.buildQuery(strCurY, strCurM, strCurD)
+                    #~ (urlList, urlQuery) = LIBERATION.produceAddressURL(currentQuery)
+                    #~ (urlList, urlQuery) = module.produceAddressURL(currentQuery)
+                    # Get the list of links from the archive search
+                    #urlList = module.produceAddressURL(currentQuery)
+                    currentQuery = module.buildQuery(strCurY, strCurM, strCurD)
 
-            urlList = list()
-            urlList = module.buildCrawlFrontier(currentQuery)
+                    urlList = module.buildCrawlFrontier(currentQuery)
 
-            if not urlList:
-                print("No Article found for date: " + currentQuery)
-                startDates += day
-                updateDoneList(args.input, source, startDates)
-                continue
+                    if not urlList:
+                        print("No Article found for date: " + currentQuery)
+                        startDates += day
+                        updateDoneList(args.input, source, startDates)
+                        continue
 
-            print(source + ' ' + currentQuery + ": " +
-                  str(len(urlList)) + ' documents found')
+                    print(source + ' ' + currentQuery + ": " +
+                          str(len(urlList)) + ' documents found')
 
-            # recuperation des conenus de articles dans une structure pour une
-            # écriture en une seule fois
-            contenu = list()
+                    # recuperation des conenus de articles dans une structure pour une
+                    # écriture en une seule fois
+                    contenu = list()
 
-            #~ print 'extracting content'
+                    #~ print 'extracting content'
 
-            # For every article link belonging to the same publication date we
-            # update the xml file
-            for link in urlList:
-                url = link[0]
-                title = link[1]
-                category = link[2]
-                fullDate = link[3]
+                    # For every article link belonging to the same publication date we
+                    # update the xml file
+                    for link in urlList:
+                        url = link[0]
+                        title = link[1]
+                        category = link[2]
+                        fullDate = link[3]
 
-                ''' This function needs to be unpacked in the following order,
-				1. Content of Article
-				2. Author
-				3. Article Date
-				4. Article Keywords
-				'''
+                        ''' This function needs to be unpacked in the following order,
+        				1. Content of Article
+        				2. Author
+        				3. Article Date
+        				4. Article Keywords
+        				'''
 
-                allContentInfo = module.cleanResultFile(url)[0]
+                        allContentInfo = module.cleanResultFile(url)[0]
 
-                if allContentInfo == "":
-                    continue
+                        if allContentInfo == "":
+                            continue
 
-                article = allContentInfo[0]
-                author = allContentInfo[1]
-                # 2 = day, 1 = month, 0 = year
-                articleDate = allContentInfo[2]
-                articleKeywords = allContentInfo[3]
+                        article = allContentInfo[0]
+                        author = allContentInfo[1]
+                        # 2 = day, 1 = month, 0 = year
+                        articleDate = allContentInfo[2]
+                        articleKeywords = allContentInfo[3]
 
-                fName = articleDate
-                if fName == "":
-                    fName = "unknownDate.xml"
-                    # Since no known published date, put it to the crawling date.
-                    articleDate = "unknownDate"
-                    dName = args.outputDir + "/" + source + "/" + strCurY + "/" + strCurM
+                        fName = articleDate
+                        if fName == "":
+                            fName = "unknownDate.xml"
+                            # Since no known published date, put it to the crawling date.
+                            articleDate = "unknownDate"
+                            dName = args.outputDir + "/" + source + "/" + strCurY + "/" + strCurM
 
-                else:
-                    dName = args.outputDir + "/" + source + "/" + \
-                        str(articleDate[0]) + "/" + \
-                        str(articleDate[1]).zfill(2)
+                        else:
+                            dName = args.outputDir + "/" + source + "/" + \
+                                str(articleDate[0]) + "/" + \
+                                str(articleDate[1]).zfill(2)
 
-                    # Now we need to assign the published date as normal datetime format
-                articleDate = str(articleDate[0]) + "-" + str(articleDate[1]).zfill(2) + "-" + str(articleDate[2]).zfill(2)
+                            # Now we need to assign the published date as normal datetime format
+                        articleDate = str(articleDate[0]) + "-" + str(articleDate[1]).zfill(2) + "-" + str(articleDate[2]).zfill(2)
 
-                fName = str(fName[2]).zfill(2) + '.xml'
+                        fName = str(fName[2]).zfill(2) + '.xml'
 
-                # Create XML File if it does not already exists.
-                createXMLFile(dName, fName, strCurD, strCurM,strCurY, source, currentQuery)
+                        # Create XML File if it does not already exists.
+                        # pdb.set_trace()
+                        createXMLFile(dName, fName, strCurD, strCurM,strCurY, source, currentQuery)
 
-                xmldoc = openXMLFile(dName, fName)
+                        xmldoc = openXMLFile(dName, fName)
 
-                articleNode = checkArticle(xmldoc, dName, fName, category, url)
+                        articleNode = checkArticle(xmldoc, dName, fName, category, url)
 
-                # Skip it since it has been crawled!
-                if articleNode is not None:
-                    print("Article found in corpus! Skipping...")
-                    continue
+                        # Skip it since it has been crawled!
+                        if articleNode is not None:
+                            print("Article found in corpus! Skipping...")
+                            continue
 
-                root = checkCategoryTag(xmldoc, dName, fName, category)
+                        root = checkCategoryTag(xmldoc, dName, fName, category)
 
-                if str(url.encode('utf-8')).find("\\xc2\\xb0") != -1:
-                    continue
+                        if str(url.encode('utf-8')).find("\\xc2\\xb0") != -1:
+                            continue
 
-                try:
-                    print(title)
-                except:
-                    pass
+                        try:
+                            print(title)
+                        except:
+                            pass
 
-                for cat in root.findall('category'):
-                    if category == cat.get('name'):
-                        catNode = cat  # Get the specific node the article belongs to
-                        break
+                        for cat in root.findall('category'):
+                            if category == cat.get('name'):
+                                catNode = cat  # Get the specific node the article belongs to
+                                break
 
-                createArticleTag(xmldoc, dName, fName, catNode, article,
-                                 url, title, author, articleDate, articleKeywords)
+                        createArticleTag(xmldoc, dName, fName, catNode, article,
+                                         url, title, author, articleDate, articleKeywords)
 
-                if fName not in modifiedFiles:
-                    modifiedFiles.append(dName + "/" + fName)
+                        if fName not in modifiedFiles:
+                            modifiedFiles.append(dName + "/" + fName)
 
-            # Reopens the file to format it before writing it back to the same file again.
-            print('Formatting files that has been modified...')
+                    # Reopens the file to format it before writing it back to the same file again.
+                    print('Formatting files that has been modified...')
 
-            formatXML(modifiedFiles)
+                    formatXML(modifiedFiles)
 
-            startDates += day
+                    startDates += day
 
-            updateDoneList(args.input, source, startDates)
+                    updateDoneList(args.input, source, startDates)
+        except:
+            counter+=1
+            print("Retrying ",counter)
+            time.sleep(4)

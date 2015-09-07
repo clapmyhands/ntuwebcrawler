@@ -1,4 +1,3 @@
 #!/bin/sh
-@echo off
 python3 buildQueries.py -i archiveList.xml -o output/
-PAUSE
+read -n1 -r -p "Press any key to continue..." key

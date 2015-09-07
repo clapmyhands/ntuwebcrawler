@@ -24,9 +24,9 @@ def createXMLFile(dName, fName, strCurD, strCurM, strCurY, source, currentQuery)
         try:
             if os.path.isdir(dName):
                 pass
-
             else:
                 os.makedirs(dName)
+
             # Create the xml file so we may update it later
             f = open(dName + "/" + fName, 'w', encoding="'utf-8'")
 
