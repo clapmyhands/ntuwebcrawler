@@ -90,12 +90,8 @@ if __name__ == '__main__':
 
             modifiedFiles = list()
 
-            strCurD = str(startDates.day)
-            strCurD = strCurD.zfill(2)  # Pads zero to the left
-
-            strCurM = str(startDates.month)
-            strCurM = strCurM.zfill(2)
-
+            strCurD = str(startDates.day)zfill(2)  # Pads zero to the left
+            strCurM = str(startDates.month).zfill(2)
             strCurY = str(startDates.year)
 
             urlList = list()
