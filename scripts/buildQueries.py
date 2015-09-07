@@ -1,14 +1,12 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-import sys
-import os
-import argparse
-import datetime
-import calendar
+import sys,os,argparse,datetime,calendar
+from retrying import retry
 from xmlHandler.xmlControl import *
 from normalisation.normalise import normalise
 from dateutil.relativedelta import relativedelta
+
 
 sys.path.append("searchEngines/")
 #~ import LIBERATION
@@ -54,6 +52,7 @@ if __name__ == '__main__':
     iniCrawlM = now.month
     iniCrawlD = now.day
 
+    @retry(wait_fixed=2000)
     for s in rootRequest:
         source = s.get('source')
         iniStartY = s.get('startY')
@@ -201,10 +200,3 @@ if __name__ == '__main__':
             startDates += day
 
             updateDoneList(args.input, source, startDates)
-
-            # Normalising after every month and after the end date is reached
-# 			if normaliseUptoDate.month != startDates.month or startDates > endDates:
-# 				# When the month is done
-# 				print('Normalising...')
-# 				normalise(normaliseUptoDate.year, normaliseUptoDate.month, source)
-# 				normaliseUptoDate + relativedelta(months=1)
