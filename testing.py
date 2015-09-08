@@ -1,53 +1,27 @@
-import os
-import re
-from datetime import *
+"""
+USE FUCKING XML TO PARSE THE CLEAN FILE DAMNIT DONT BRUTE FORCE MY UCKING WAY
 
-def getInput():
-    newssite = input("Input the news site you want to clean up: ")
-    startClean = input("Year-Month-Day to start clean up <strict format>: ")
-    amount = int(input("How many files to clean: "))
-    startClean = startClean.split('-')
-    return [newssite,int(startClean[0]),int(startClean[1]),int(startClean[2]),amount]
+"""
+import re,lxml
 
-def sourceDir(direct,time):
-    sourceDir = direct + "/" + str(time.year) + "/" + \
-                str(time.month).zfill(2) + "/" + \
-                str(time.day).zfill(2) + ".xml"
-    return sourceDir
+dName = "scripts/output/tribun/2015/08"
+fName = "02.xml"
 
-userInput=getInput()
-deltatime = timedelta(days=1)
+oName = "scripts/clean/tribun/2015/08"
+ofName = "02.xml"
 
-sName = "scripts/output/"
-dName = "scripts/output/clean/"
-    
-def newDir(directory):
-    if(os.path.isdir(directory)):
-        pass
-    else:
-        try:
-            os.makedirs(directory)
-        except OSError:
-            pass
-newDir(dName)
+with open(dName + '/' + fName,'r') as myFile:
+  f=myFile.read()
 
-def writeFile(user_input,amount):
-    myTime = date(user_input[1],user_input[2],user_input[3])
-    for iter in range(amount):
-        fName = sourceDir(userInput[0],myTime)
-        readFile =  open(sName+fName,'r',encoding="'utf-8'")
-        f = readFile.read().strip()
-        readFile.close()
+f = re.sub("\<(.*?)\>","",f)
+f = re.sub("[\t]+","",f)
+f = re.sub("[\n]+","\n",f)
+f = re.sub(" +"," ",f)
+f = f.split("\n")
+for lines in f:
+    lines = lines.strip()
+for i in range (20):
+  print(i,"~",repr(f[i]))
 
-        f = re.sub("\<(.*?)\>"," ",f).strip()
-        writeName = fName.split("/",1)[-1].split('.')[0]
-        writeName = writeName + ".txt"
-        newDir(dName+"/".join(writeName.split('/')[0:-1]))
-            
-        File = open(dName+writeName,'w',encoding="'utf-8'")
-        File.write(f)
-        File.close()
-
-        myTime += deltatime
-
-writeFile(userInput,userInput[4])
+#f = re.sub("[\n]+","\n",f)
+#f = re.sub("( )+"," ",f)
